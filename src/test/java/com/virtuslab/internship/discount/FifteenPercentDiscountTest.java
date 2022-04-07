@@ -34,4 +34,26 @@ public class FifteenPercentDiscountTest {
         assertEquals(expectedTotalPrice, receiptAfterDiscount.totalPrice());
         assertEquals(1, receiptAfterDiscount.discounts().size());
     }
+
+    @Test
+    void shouldNotApply15PercentDiscountWhenThereAreLessThan3GrainsInTheBasket() {
+        // Given
+        var productDb = new ProductDb();
+        var bread = productDb.getProduct("Bread");
+        var cereals = productDb.getProduct("Cereals");
+        List<ReceiptEntry> receiptEntries = new ArrayList<>();
+        receiptEntries.add(new ReceiptEntry(bread, 1));
+        receiptEntries.add(new ReceiptEntry(cereals, 1));
+
+        var receipt = new Receipt(receiptEntries);
+        var discount = new FifteenPercentDiscount();
+        var expectedTotalPrice = bread.price().add(cereals.price());
+
+        // When
+        var receiptAfterDiscount = discount.apply(receipt);
+
+        // Then
+        assertEquals(expectedTotalPrice, receiptAfterDiscount.totalPrice());
+        assertEquals(0, receiptAfterDiscount.discounts().size());
+    }
 }
