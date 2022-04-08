@@ -1,10 +1,14 @@
 package com.virtuslab.internship.receipt;
 
 import com.virtuslab.internship.basket.Basket;
+import com.virtuslab.internship.discount.DiscountApplier;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ReceiptGenerator {
+
+    private final DiscountApplier discountApplier = new DiscountApplier();
 
     public Receipt generate(Basket basket) {
         var products = basket.getProducts();
@@ -15,6 +19,7 @@ public class ReceiptGenerator {
 
         Receipt receipt = new Receipt();
         receipt.update(receiptEntries);
+        discountApplier.accept(receipt);
         return receipt;
     }
 }

@@ -20,10 +20,13 @@ public class DiscountApplier implements Consumer<Receipt> {
 
     private boolean shouldApply(Receipt receipt, Discount discount) {
         return switch (discount) {
-            case FIFTEEN_PERCENT -> receipt.getEntries().stream().filter(Objects::nonNull)
-                    .filter(receiptEntry -> receiptEntry.product().type().equals(Product.Type.GRAINS))
-                    .reduce(0, ((integer, entry) -> integer + entry.quantity()), Integer::sum) >= 3;
-            case TEN_PERCENT -> receipt.getTotalPrice().compareTo(BigDecimal.valueOf(50)) > 0;
+            case FIFTEEN_PERCENT -> !receipt.getDiscounts().contains(Discount.FIFTEEN_PERCENT) &&
+                    receipt.getEntries().stream()
+                            .filter(Objects::nonNull)
+                            .filter(receiptEntry -> receiptEntry.product().type().equals(Product.Type.GRAINS))
+                            .reduce(0, ((integer, entry) -> integer + entry.quantity()), Integer::sum) >= 3;
+            case TEN_PERCENT -> !receipt.getDiscounts().contains(Discount.TEN_PERCENT) &&
+                    receipt.getTotalPrice().compareTo(BigDecimal.valueOf(50)) > 0;
         };
     }
 }
