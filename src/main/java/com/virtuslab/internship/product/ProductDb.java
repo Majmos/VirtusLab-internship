@@ -1,6 +1,7 @@
 package com.virtuslab.internship.product;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,9 +29,9 @@ public class ProductDb {
     }
 
     public Product getProduct(String productName) {
-        return products.stream()
-                .filter(product -> productName.equals(product.name()))
-                .findFirst()
-                .get();
+        Optional<Product> product = products.stream()
+                .filter(p -> productName.equals(p.name()))
+                .findFirst();
+        return product.orElse(null);
     }
 }
