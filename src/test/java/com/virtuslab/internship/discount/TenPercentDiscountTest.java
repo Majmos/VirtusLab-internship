@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TenPercentDiscountTest {
 
+    private final DiscountApplier discountApplier = new DiscountApplier();
+
     @Test
     void shouldApply10PercentDiscountWhenPriceIsAbove50() {
         // Given
@@ -23,16 +25,16 @@ class TenPercentDiscountTest {
         receiptEntries.add(new ReceiptEntry(cheese, 1));
         receiptEntries.add(new ReceiptEntry(steak, 1));
 
-        var receipt = new Receipt(receiptEntries);
-        var discount = new TenPercentDiscount();
+        var receipt = new Receipt();
+        receipt.update(receiptEntries);
         var expectedTotalPrice = cheese.price().add(steak.price()).multiply(BigDecimal.valueOf(0.9));
 
         // When
-        var receiptAfterDiscount = discount.apply(receipt);
+        discountApplier.accept(receipt);
 
         // Then
-        assertEquals(expectedTotalPrice, receiptAfterDiscount.totalPrice());
-        assertEquals(1, receiptAfterDiscount.discounts().size());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice());
+        assertEquals(1, receipt.getDiscounts().size());
     }
 
     @Test
@@ -43,15 +45,17 @@ class TenPercentDiscountTest {
         List<ReceiptEntry> receiptEntries = new ArrayList<>();
         receiptEntries.add(new ReceiptEntry(cheese, 2));
 
-        var receipt = new Receipt(receiptEntries);
-        var discount = new TenPercentDiscount();
+        var receipt = new Receipt();
+        receipt.update(receiptEntries);
         var expectedTotalPrice = cheese.price().multiply(BigDecimal.valueOf(2));
 
         // When
-        var receiptAfterDiscount = discount.apply(receipt);
+        discountApplier.accept(receipt);
 
         // Then
-        assertEquals(expectedTotalPrice, receiptAfterDiscount.totalPrice());
-        assertEquals(0, receiptAfterDiscount.discounts().size());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice());
+        assertEquals(0, receipt.getDiscounts().size());
     }
+
+
 }

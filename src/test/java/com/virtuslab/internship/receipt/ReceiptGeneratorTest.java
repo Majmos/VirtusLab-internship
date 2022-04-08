@@ -32,9 +32,9 @@ class ReceiptGeneratorTest {
 
         // Then
         assertNotNull(receipt);
-        assertEquals(3, receipt.entries().size());
-        assertEquals(expectedTotalPrice, receipt.totalPrice());
-        assertEquals(0, receipt.discounts().size());
+        assertEquals(3, receipt.getEntries().size());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice());
+        assertEquals(0, receipt.getDiscounts().size());
     }
 
 }

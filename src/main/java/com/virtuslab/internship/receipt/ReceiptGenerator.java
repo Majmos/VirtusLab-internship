@@ -11,6 +11,8 @@ public class ReceiptGenerator {
         var productsMap = products.stream().collect(Collectors.toMap(product -> product, product -> 1, Integer::sum));
         List<ReceiptEntry> receiptEntries = productsMap.entrySet().stream().map(entry -> new ReceiptEntry(entry.getKey(), entry.getValue())).collect(Collectors.toList());
 
-        return new Receipt(receiptEntries);
+        Receipt receipt = new Receipt();
+        receipt.update(receiptEntries);
+        return receipt;
     }
 }

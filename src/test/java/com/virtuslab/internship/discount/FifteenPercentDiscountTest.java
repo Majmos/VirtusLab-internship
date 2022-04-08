@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FifteenPercentDiscountTest {
 
+    private final DiscountApplier discountApplier = new DiscountApplier();
+
     @Test
     void shouldApply15PercentDiscountWhenThereAreAtLeast3GrainsInTheBasket() {
         // Given
@@ -23,37 +25,66 @@ public class FifteenPercentDiscountTest {
         receiptEntries.add(new ReceiptEntry(bread, 1));
         receiptEntries.add(new ReceiptEntry(cereals, 2));
 
-        var receipt = new Receipt(receiptEntries);
-        var discount = new FifteenPercentDiscount();
-        var expectedTotalPrice = bread.price().add(cereals.price().multiply(BigDecimal.valueOf(2))).multiply(BigDecimal.valueOf(0.85));
+        var receipt = new Receipt();
+        receipt.update(receiptEntries);
+        var expectedTotalPrice = bread.price().add(cereals.price().multiply(BigDecimal.valueOf(2)))
+                .multiply(BigDecimal.valueOf(0.85));
 
         // When
-        var receiptAfterDiscount = discount.apply(receipt);
+        discountApplier.accept(receipt);
 
         // Then
-        assertEquals(expectedTotalPrice, receiptAfterDiscount.totalPrice());
-        assertEquals(1, receiptAfterDiscount.discounts().size());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice());
+        assertEquals(1, receipt.getDiscounts().size());
     }
 
     @Test
     void shouldNotApply15PercentDiscountWhenThereAreLessThan3GrainsInTheBasket() {
         // Given
         var productDb = new ProductDb();
+        var milk = productDb.getProduct("Milk");
         var bread = productDb.getProduct("Bread");
         var cereals = productDb.getProduct("Cereals");
         List<ReceiptEntry> receiptEntries = new ArrayList<>();
+        receiptEntries.add(new ReceiptEntry(milk, 1));
         receiptEntries.add(new ReceiptEntry(bread, 1));
         receiptEntries.add(new ReceiptEntry(cereals, 1));
 
-        var receipt = new Receipt(receiptEntries);
-        var discount = new FifteenPercentDiscount();
-        var expectedTotalPrice = bread.price().add(cereals.price());
+        var receipt = new Receipt();
+        receipt.update(receiptEntries);
+        var expectedTotalPrice = milk.price().add(bread.price()).add(cereals.price());
 
         // When
-        var receiptAfterDiscount = discount.apply(receipt);
+        discountApplier.accept(receipt);
 
         // Then
-        assertEquals(expectedTotalPrice, receiptAfterDiscount.totalPrice());
-        assertEquals(0, receiptAfterDiscount.discounts().size());
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice());
+        assertEquals(0, receipt.getDiscounts().size());
+    }
+
+    @Test
+    void shouldApply15PercentDiscountBefore10PercentDiscount() {
+        // Given
+        var productDb = new ProductDb();
+        var pork = productDb.getProduct("Pork");
+        var bread = productDb.getProduct("Bread");
+        var cereals = productDb.getProduct("Cereals");
+        List<ReceiptEntry> receiptEntries = new ArrayList<>();
+        receiptEntries.add(new ReceiptEntry(pork, 2));
+        receiptEntries.add(new ReceiptEntry(bread, 1));
+        receiptEntries.add(new ReceiptEntry(cereals, 2));
+
+        var receipt = new Receipt();
+        receipt.update(receiptEntries);
+        var expectedTotalPrice = pork.price().multiply(BigDecimal.valueOf(2)).add(bread.price())
+                .add(cereals.price().multiply(BigDecimal.valueOf(2)))
+                .multiply(BigDecimal.valueOf(0.85));
+
+        // When
+        discountApplier.accept(receipt);
+
+        // Then
+        assertEquals(expectedTotalPrice, receipt.getTotalPrice());
+        assertEquals(1, receipt.getDiscounts().size());
     }
 }
