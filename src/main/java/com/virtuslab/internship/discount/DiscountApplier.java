@@ -4,9 +4,6 @@ import com.virtuslab.internship.product.Product;
 import com.virtuslab.internship.receipt.Receipt;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
